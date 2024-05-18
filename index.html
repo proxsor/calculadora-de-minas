@@ -468,38 +468,40 @@
             function calculate() {
                 if (!document.querySelector('form').reportValidity()) return false;
                 const position = parseInt(document.getElementById('position').value);
-                const metalLevel = parseInt(document.getElementById('metal-level').value);
-                const crystalLevel = parseInt(document.getElementById('crystal-level').value);
-                const deuteriumLevel = parseInt(document.getElementById('deuterium-level').value);
+                let metalLevel = parseInt(document.getElementById('metal-level').value);
+                let crystalLevel = parseInt(document.getElementById('crystal-level').value);
+                let deuteriumLevel = parseInt(document.getElementById('deuterium-level').value);
                 if (isNaN(position) || isNaN(metalLevel) || isNaN(crystalLevel) || isNaN(deuteriumLevel)) return false;
                 const temperature = temperatureByPlanetSlot[position];
-                const metalProduction = getBaseMineProduction(METAL_TYPE, metalLevel, position, 1000, temperature, temperature);
-                const crystalProduction = getBaseMineProduction(CRYSTAL_TYPE, crystalLevel, position, 1000, temperature, temperature);
-                const deuteriumProduction = getBaseMineProduction(DEUTERIUM_TYPE, deuteriumLevel, position, 1000, temperature, temperature);
-                const metalCost = getMineCost(METAL_TYPE, metalLevel);
-                const crystalCost = getMineCost(CRYSTAL_TYPE, crystalLevel);
-                const deuteriumCost = getMineCost(DEUTERIUM_TYPE, deuteriumLevel);
-                const metalAmortization = (metalCost.metal + metalCost.crystal * 1.5) / (metalProduction);
-                const crystalAmortization = (crystalCost.metal + crystalCost.crystal * 1.5) / (crystalProduction * 1.5);
-                const deuteriumAmortization = (deuteriumCost.metal + deuteriumCost.crystal * 1.5) / (deuteriumProduction * 3);
-                console.log({metalAmortization, crystalAmortization, deuteriumAmortization});
-                const minimumAmortization = Math.min(metalAmortization, crystalAmortization, deuteriumAmortization);
-                if (metalAmortization === minimumAmortization) {
-                    document.getElementById('div-result').innerText = "Subí el metal!";
+                let result = ["Subir minas en el siguiente orden:"];
+                for (let i = 0; i < 10; i++) {
+                    const metalProduction = getBaseMineProduction(METAL_TYPE, metalLevel, position, 1000, temperature, temperature);
+                    const crystalProduction = getBaseMineProduction(CRYSTAL_TYPE, crystalLevel, position, 1000, temperature, temperature);
+                    const deuteriumProduction = getBaseMineProduction(DEUTERIUM_TYPE, deuteriumLevel, position, 1000, temperature, temperature);
+                    const metalCost = getMineCost(METAL_TYPE, metalLevel);
+                    const crystalCost = getMineCost(CRYSTAL_TYPE, crystalLevel);
+                    const deuteriumCost = getMineCost(DEUTERIUM_TYPE, deuteriumLevel);
+                    const metalAmortization = (metalCost.metal + metalCost.crystal * 1.5) / (metalProduction);
+                    const crystalAmortization = (crystalCost.metal + crystalCost.crystal * 1.5) / (crystalProduction * 1.5);
+                    const deuteriumAmortization = (deuteriumCost.metal + deuteriumCost.crystal * 1.5) / (deuteriumProduction * 3);
+                    console.log({metalAmortization, crystalAmortization, deuteriumAmortization});
+                    const minimumAmortization = Math.min(metalAmortization, crystalAmortization, deuteriumAmortization);
+                    if (metalAmortization === minimumAmortization) {
+                        result.push("Metal " + ++metalLevel);
+                    }
+                    if (crystalAmortization === minimumAmortization) {
+                        result.push("Cristal " + ++crystalLevel);
+                    }
+                    if (deuteriumAmortization === minimumAmortization) {
+                        result.push("Deuterio " + ++deuteriumLevel);
+                    }
                 }
-                if (crystalAmortization === minimumAmortization) {
-                    document.getElementById('div-result').innerText = "Subí el cristal!";
-                }
-                if (deuteriumAmortization === minimumAmortization) {
-                    document.getElementById('div-result').innerText = "Subí el deuterio!";
-                }
+                document.getElementById('div-result').innerText = result.join("\n");
                 return false;
             }
 
             const btCalculate = document.getElementById("bt-calculate");
-            btCalculate.addEventListener('click', calculate);
-            const form = document.getElementById('form-calculate');
-            //form.addEventListener('submit', calculate); 
+            btCalculate.addEventListener('click', calculate); 
             
         </script>
     </body>
